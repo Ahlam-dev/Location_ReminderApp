@@ -62,7 +62,7 @@ class RemindersActivityTest :
      */
     @Before
     fun init() {
-        stopKoin()//stop the original app koin
+        stopKoin()
         appContext = getApplicationContext()
         val myModule = module {
             viewModel {
