@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.PendingIntent
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
@@ -34,6 +35,7 @@ import org.koin.android.ext.android.inject
 class SaveReminderFragment : BaseFragment() {
     private lateinit var geofencingClient: GeofencingClient
     private lateinit var reminder: ReminderDataItem
+    private lateinit var contxt: Context
 
     //Get the view model this time as a single to be shared with the another fragment
     override val _viewModel: SaveReminderViewModel by inject()
@@ -41,9 +43,9 @@ class SaveReminderFragment : BaseFragment() {
     private val runningQOrLater = android.os.Build.VERSION.SDK_INT >=
             android.os.Build.VERSION_CODES.Q
     private val geofencePindingInntent: PendingIntent by lazy {
-        val intent = Intent(requireContext(), GeofenceBroadcastReceiver::class.java)
+        val intent = Intent(contxt, GeofenceBroadcastReceiver::class.java)
         intent.action = ACTION_GEOFENCE_EVENT
-        PendingIntent.getBroadcast(requireContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.getBroadcast(contxt, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     override fun onCreateView(
@@ -87,7 +89,10 @@ class SaveReminderFragment : BaseFragment() {
 
         }
     }
-
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        contxt = context
+    }
 
     private fun checkPermissionsAndStartGeofencing(dataItem: ReminderDataItem) {
         if (foregroundAndBackgroundLocationPermissionApproved()) {
@@ -101,13 +106,13 @@ class SaveReminderFragment : BaseFragment() {
     private fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
         val foregroundLocationApproved = (
                 PackageManager.PERMISSION_GRANTED ==
-                        ActivityCompat.checkSelfPermission(this.requireContext(),
+                        ActivityCompat.checkSelfPermission(contxt,
                                 Manifest.permission.ACCESS_FINE_LOCATION))
         val backgroundPermissionApproved =
                 if (runningQOrLater) {
                     PackageManager.PERMISSION_GRANTED ==
                             ActivityCompat.checkSelfPermission(
-                                    requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                                contxt, Manifest.permission.ACCESS_BACKGROUND_LOCATION
                             )
                 } else {
                     true

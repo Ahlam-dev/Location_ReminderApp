@@ -80,15 +80,12 @@ class RemindersActivityTest :
             single { RemindersLocalRepository(get()) as ReminderDataSource }
             single { LocalDB.createRemindersDao(appContext) }
         }
-        //declare a new koin module
         startKoin {
             modules(listOf(myModule))
         }
-        //Get our real repository
         repository = get()
         viewModel = get()
 
-        //clear the data to start fresh
         runBlocking {
             repository.deleteAllReminders()
 
@@ -108,7 +105,7 @@ class RemindersActivityTest :
     }
 
     @Test
-    fun loggedIn_saveNewReminder() = runBlocking{
+    fun loggedIn_saveNewReminder() = runBlocking {
 
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -133,13 +130,9 @@ class RemindersActivityTest :
         delay(1000)
         onView(withId(R.id.save_button)).perform(click())
 
-
-
         onView(withId(R.id.saveReminder)).perform(click())
-
-
-
-
+        onView(withText(title)).check(ViewAssertions.matches(isDisplayed()))
+        onView(withText(description)).check(ViewAssertions.matches(isDisplayed()))
 
         activityScenario.close()
     }
