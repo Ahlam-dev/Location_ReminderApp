@@ -3,39 +3,32 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Intent
-import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.net.Uri
 import android.os.Bundle
-import android.provider.SettingsSlicesContract.KEY_LOCATION
+import android.provider.Settings
 import android.util.Log
 import android.view.*
-import androidx.core.app.ActivityCompat
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.navigation.fragment.findNavController
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.common.config.GservicesValue.value
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import com.google.android.material.snackbar.Snackbar
+import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
+import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
-import com.udacity.project4.base.NavigationCommand
 
 class SelectLocationFragment : BaseFragment() {
 
@@ -50,11 +43,18 @@ class SelectLocationFragment : BaseFragment() {
 
     @SuppressLint("MissingPermission")
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         binding =
-                DataBindingUtil.inflate(inflater, R.layout.fragment_select_location, container, false)
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+                DataBindingUtil.inflate(
+                    inflater,
+                    R.layout.fragment_select_location,
+                    container,
+                    false
+                )
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(
+            requireActivity()
+        )
 
         binding.viewModel = _viewModel
         binding.lifecycleOwner = this
@@ -99,10 +99,10 @@ class SelectLocationFragment : BaseFragment() {
         try {
 
             val success = map.setMapStyle(
-                    MapStyleOptions.loadRawResourceStyle(
-                            requireContext(),
-                            R.raw.map_style
-                    )
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.map_style
+                )
             )
             if (!success) {
                 Log.e(TAG, "Style parsing failed.")
@@ -115,9 +115,9 @@ class SelectLocationFragment : BaseFragment() {
     private fun setPoiClick(map: GoogleMap) {
         map.setOnPoiClickListener { poi ->
             map.addMarker(
-                    MarkerOptions()
-                            .position(poi.latLng)
-                            .title(poi.name)
+                MarkerOptions()
+                    .position(poi.latLng)
+                    .title(poi.name)
 
             )
             selected_Poi =poi
@@ -126,12 +126,12 @@ class SelectLocationFragment : BaseFragment() {
     }
 
     private fun setLocationClick(map: GoogleMap) {
-        map.setOnMapLongClickListener {latLng->
+        map.setOnMapLongClickListener { latLng->
             val snippet = String.format(
-                    Locale.getDefault(),
-                    getString(R.string.lat_long_snippet),
-                    latLng.latitude,
-                    latLng.longitude
+                Locale.getDefault(),
+                getString(R.string.lat_long_snippet),
+                latLng.latitude,
+                latLng.longitude
             )
             binding.saveButton.setOnClickListener {
                 _viewModel.reminderSelectedLocationStr.value = getString(R.string.dropped_pin)
@@ -140,10 +140,10 @@ class SelectLocationFragment : BaseFragment() {
                 _viewModel.navigationCommand.value = NavigationCommand.Back
             }
          map.addMarker(
-                    MarkerOptions().position(latLng)
-                            .title(getString(R.string.dropped_pin))
-                            .snippet(snippet)
-            )
+             MarkerOptions().position(latLng)
+                 .title(getString(R.string.dropped_pin))
+                 .snippet(snippet)
+         )
 
         }
 
@@ -151,8 +151,9 @@ class SelectLocationFragment : BaseFragment() {
 
     private fun isPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
-                activity!!,
-                Manifest.permission.ACCESS_FINE_LOCATION) === PackageManager.PERMISSION_GRANTED
+            activity!!,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) === PackageManager.PERMISSION_GRANTED
     }
 
     @SuppressLint("MissingPermission")
@@ -161,10 +162,9 @@ class SelectLocationFragment : BaseFragment() {
             locationPermissionGranted = true
             map.isMyLocationEnabled = true
         } else {
-            ActivityCompat.requestPermissions(
-                    activity!!,
-                    arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
-                    REQUEST_LOCATION_PERMISSION
+            requestPermissions(
+                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION_PERMISSION
             )
         }
     }
@@ -174,19 +174,57 @@ class SelectLocationFragment : BaseFragment() {
     private fun zoomingUser() {
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { lastKnownLocation ->
             if (lastKnownLocation != null) {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        LatLng(lastKnownLocation.latitude,
-                                lastKnownLocation.longitude), 15f))
+                map.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(
+                            lastKnownLocation.latitude,
+                            lastKnownLocation.longitude
+                        ), 15f
+                    )
+                )
             } else {
                 Log.i("zoomUser", "lastKnownLocation is null!")
             }
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.size > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 locationPermissionGranted = true
+                enableMyLocation()
+            }
+            else{
+               val isDeny= shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+                if(isDeny) {
+                    Toast.makeText(
+                        context,
+                        R.string.permission_denied_explanation,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    requestPermissions(
+                        arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+                        REQUEST_LOCATION_PERMISSION
+                    )
+                }else{
+                    Toast.makeText(
+                        context,
+                        R.string.location_required_error,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    startActivity(
+                        Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.parse("package:" + BuildConfig.APPLICATION_ID)
+                        )
+                    )
+
+                }
             }
         }
     }

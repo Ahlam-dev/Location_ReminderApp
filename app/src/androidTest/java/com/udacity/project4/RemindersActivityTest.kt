@@ -1,23 +1,21 @@
 package com.udacity.project4
 
+import android.R
 import android.app.Application
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.ViewAction
-import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.locationreminders.data.ReminderDataSource
-import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
@@ -39,6 +37,7 @@ import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 import org.koin.test.get
 import org.mockito.ArgumentMatchers.matches
+
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -131,6 +130,7 @@ class RemindersActivityTest :
         onView(withId(R.id.save_button)).perform(click())
 
         onView(withId(R.id.saveReminder)).perform(click())
+        // testing toast message
         onView(withText(title)).check(ViewAssertions.matches(isDisplayed()))
         onView(withText(description)).check(ViewAssertions.matches(isDisplayed()))
 

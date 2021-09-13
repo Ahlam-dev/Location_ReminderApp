@@ -6,6 +6,7 @@ import android.view.*
 import androidx.databinding.DataBindingUtil
 import com.firebase.ui.auth.AuthUI
 import com.udacity.project4.R
+import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentRemindersBinding
@@ -75,8 +76,9 @@ class ReminderListFragment : BaseFragment() {
         when (item.itemId) {
             R.id.logout -> {
                 AuthUI.getInstance().signOut(requireContext())
-                val homeIntent = Intent(activity, RemindersActivity::class.java)
+                val homeIntent = Intent(activity, AuthenticationActivity::class.java)
                 startActivity(homeIntent)
+                activity?.finish()
 
             }
         }
