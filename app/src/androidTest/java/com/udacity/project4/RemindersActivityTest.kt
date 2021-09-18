@@ -1,7 +1,9 @@
 package com.udacity.project4
 
-import android.R
+import android.app.Activity
 import android.app.Application
+import android.app.PendingIntent.getActivity
+import android.service.autofill.Validators.not
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso
@@ -25,6 +27,8 @@ import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoIdlingResource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.not
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -131,10 +135,31 @@ class RemindersActivityTest :
 
         onView(withId(R.id.saveReminder)).perform(click())
         // testing toast message
+        onView(withText(R.string.reminder_saved)).inRoot(
+            withDecorView(
+                not(
+                    `is`(
+                        getActivity(
+                            activityScenario
+                        )!!.window.decorView
+                    )
+                )
+            )
+        )
+            .check(ViewAssertions.matches(isDisplayed()))
+
         onView(withText(title)).check(ViewAssertions.matches(isDisplayed()))
         onView(withText(description)).check(ViewAssertions.matches(isDisplayed()))
 
         activityScenario.close()
+    }
+
+    private fun getActivity(activityScenario: ActivityScenario<RemindersActivity>): Activity? {
+        var activity: Activity? = null
+        activityScenario.onActivity {
+            activity = it
+        }
+        return activity
     }
 
     @Test

@@ -65,16 +65,17 @@ class SelectLocationFragment : BaseFragment() {
         mapFragment.getMapAsync {
 //on map ready
             map = it
+            setMapStyle(map)
+
             enableMyLocation()
 
-            if (locationPermissionGranted) {
-                setMapStyle(map)
-                zoomingUser()
+            /*if (isPermissionGranted()) {
+
                 _viewModel.showToast.postValue(getString(R.string.select_poi_or_location))
                 setLocationClick(map)
                 setPoiClick(map)
 
-            }
+            }*/
 
 
         }
@@ -151,7 +152,7 @@ class SelectLocationFragment : BaseFragment() {
 
     private fun isPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
-            activity!!,
+            context!!,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) === PackageManager.PERMISSION_GRANTED
     }
@@ -161,9 +162,13 @@ class SelectLocationFragment : BaseFragment() {
         if (isPermissionGranted()) {
             locationPermissionGranted = true
             map.isMyLocationEnabled = true
+            zoomingUser()
+            _viewModel.showToast.postValue(getString(R.string.select_poi_or_location))
+            setLocationClick(map)
+            setPoiClick(map)
         } else {
             requestPermissions(
-                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 REQUEST_LOCATION_PERMISSION
             )
         }
