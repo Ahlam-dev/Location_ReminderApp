@@ -69,13 +69,7 @@ class SelectLocationFragment : BaseFragment() {
 
             enableMyLocation()
 
-            /*if (isPermissionGranted()) {
 
-                _viewModel.showToast.postValue(getString(R.string.select_poi_or_location))
-                setLocationClick(map)
-                setPoiClick(map)
-
-            }*/
 
 
         }
@@ -212,24 +206,13 @@ class SelectLocationFragment : BaseFragment() {
                         R.string.permission_denied_explanation,
                         Toast.LENGTH_SHORT
                     ).show()
-                    requestPermissions(
-                        arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
-                        REQUEST_LOCATION_PERMISSION
-                    )
-                }else{
+
+                }else
                     Toast.makeText(
                         context,
                         R.string.location_required_error,
                         Toast.LENGTH_SHORT
                     ).show()
-                    startActivity(
-                        Intent(
-                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.parse("package:" + BuildConfig.APPLICATION_ID)
-                        )
-                    )
-
-                }
             }
         }
     }

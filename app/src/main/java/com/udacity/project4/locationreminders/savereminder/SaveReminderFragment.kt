@@ -33,12 +33,13 @@ import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SaveReminderFragment : BaseFragment() {
     private lateinit var geofencingClient: GeofencingClient
     private lateinit var reminder: ReminderDataItem
     private lateinit var contxt: Context
-private  var   backgroundPermissionApproved :Boolean = false
+    private var backgroundPermissionApproved: Boolean = false
 
     //Get the view model this time as a single to be shared with the another fragment
     override val _viewModel: SaveReminderViewModel by inject()
@@ -113,7 +114,7 @@ private  var   backgroundPermissionApproved :Boolean = false
                             contxt,
                             Manifest.permission.ACCESS_FINE_LOCATION
                         ))
-         backgroundPermissionApproved =
+        backgroundPermissionApproved =
             if (runningQOrLater) {
                 PackageManager.PERMISSION_GRANTED ==
                         ActivityCompat.checkSelfPermission(
@@ -176,7 +177,8 @@ private  var   backgroundPermissionApproved :Boolean = false
         } else {
             Log.d(TAG, "checkDeviceLocationSettingsAndStartGeofence")
             checkDeviceLocationSettingsAndStartGeofence(dataItem = reminder)
-    }}
+        }
+    }
 
 
     private fun checkDeviceLocationSettingsAndStartGeofence(
@@ -216,8 +218,10 @@ private  var   backgroundPermissionApproved :Boolean = false
         }
         locationSettingsResponseTask.addOnCompleteListener {
             if (it.isSuccessful && dataItem != null) {
-                if (!dataItem.title.isNullOrEmpty() && !dataItem.location.isNullOrEmpty())
+                if (!dataItem.title.isNullOrEmpty() && !dataItem.location.isNullOrEmpty()) {
+
                     addReminderGeofence(dataItem)
+                } else _viewModel.validateAndSaveReminder(dataItem)
             }
         }
     }
@@ -273,10 +277,10 @@ private  var   backgroundPermissionApproved :Boolean = false
 
     companion object {
 
-            private const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
-            private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
-            private const val LOCATION_PERMISSION_INDEX = 0
-            private const val BACKGROUND_LOCATION_PERMISSION_INDEX = 1
+        private const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
+        private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
+        private const val LOCATION_PERMISSION_INDEX = 0
+        private const val BACKGROUND_LOCATION_PERMISSION_INDEX = 1
         private const val REQUEST_CODE_DEVICE_LOCATION_SETTINGS = 7
         private const val GEOFENCE_RADIUS_IN_METERS = 100f
         private const val ACTION_GEOFENCE_EVENT =
