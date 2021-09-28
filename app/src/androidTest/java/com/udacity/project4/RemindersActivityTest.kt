@@ -141,7 +141,7 @@ class RemindersActivityTest :
             onView(withId(R.id.map)).perform(longClick())
             delay(1000)
             onView(withId(R.id.save_button)).perform(click())
-
+Thread.sleep(2000)
             onView(withId(R.id.saveReminder)).perform(click())
             // testing toast message
             onView(withText(R.string.reminder_saved)).inRoot(
