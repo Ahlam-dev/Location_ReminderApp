@@ -57,8 +57,6 @@ class RemindersActivityTest :
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
 
-    @get:Rule
-    var activityScenarioRule = ActivityScenarioRule(RemindersActivity::class.java)
 
     private val dataBindingIdlingResource = DataBindingIdlingResource()
 
